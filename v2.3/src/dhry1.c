@@ -367,6 +367,9 @@
  */
 
 /* Compiler and system dependent definitions: */
+#if __STDC_VERSION__ < 199901L
+  #error This version of dhystone is designed for a C99-compliant compiler!
+#endif
 
 /* variables for time measurement: */
 
@@ -376,7 +379,7 @@
 #undef HZ
 #define HZ	(1) /* time() returns time in seconds */
 extern long     time(); /* see library function "time"  */
-#define Too_Small_Time 2 /* Measurements should last at least 2 seconds */
+#define Too_Small_Time 22 /* Measurements should last at least 22 seconds to get a statistic accuracy */
 #define Start_Timer() Begin_Time = time ( (long *) 0)
 #define Stop_Timer()  End_Time   = time ( (long *) 0)
 
@@ -403,7 +406,7 @@ extern clock_t	clock();
 #ifndef HZ	/* Added by SP 900619 */
 #include <sys/param.h> /* If your system doesn't have this, use -DHZ=xxx */
 #else
-	*** You must define HZ!!! ***
+  #error *** You must define HZ!!! ***
 #endif /* HZ */
 #ifndef PASS2
 struct tms      time_info;
@@ -470,35 +473,27 @@ struct tms      time_info;
 
 typedef char CHAR;
 
-#ifdef  NOENUM
-#define Ident_1 0
-#define Ident_2 1
-#define Ident_3 2
-#define Ident_4 3
-#define Ident_5 4
-  typedef INT   Enumeration;
-#else
-  typedef       enum    {Ident_1, Ident_2, Ident_3, Ident_4, Ident_5}
-                Enumeration;
-#endif
-
 // Do what we can to ensure functions aren't inlined and prevent
 // the compiler from being too smart during optimizations.
-#define STATIC __declspec(noinline)
-#define NOINLINE __attribute__ ((noinline))
+#define MSVC_NOINLINE __declspec(noinline)
+#define GCC_NOINLINE __attribute__ ((noinline))
 #define PREVENT_INLINE() __asm__ ("")
+
+#define STORAGE_CLASS_DECLARATOR MSVC_NOINLINE
+#define ATTRIBUTES_DECLARATOR GCC_NOINLINE
+#define POST_RET_DECLARATOR
+
+#define STORAGE_CLASS MSVC_NOINLINE
+#define ATTRIBUTES
+#define POST_RET
+
 #pragma no_inline
 #pragma noinline
 
-/* for boolean and enumeration types in Ada, Pascal */
-
 /* General definitions: */
 
-#define Null 0 
-                /* Value of a Null pointer */
-#define true  1
-#define false 0
-
+typedef enum    {Ident_1, Ident_2, Ident_3, Ident_4, Ident_5}
+                Enumeration;
 typedef INT     One_Thirty;
 typedef INT     One_Fifty;
 typedef CHAR    Capital_Letter;
@@ -507,6 +502,18 @@ typedef char    Str_30 [31];
 typedef INT     Arr_1_Dim [50];
 typedef INT     Arr_2_Dim [50] [50];
 
+#ifndef PASS2
+#ifndef REG
+        Boolean Reg = false;
+#define REG
+        /* REG becomes defined as empty */
+        /* i.e. no register variables   */
+#else
+        Boolean Reg = true;
+#undef REG
+#define REG register
+#endif
+#endif
 
 
 typedef struct record 
@@ -530,41 +537,44 @@ typedef struct record
           } variant;
       } Rec_Type, *Rec_Pointer;
 
-// forward declarations
-STATIC void NOINLINE Proc_5 (void); /* without parameters */
-STATIC void NOINLINE Proc_4 (void); /* without parameters */
-STATIC Boolean NOINLINE Func_2 (Str_30  Str_1_Par_Ref,
-                                Str_30  Str_2_Par_Ref);
-STATIC void NOINLINE Proc_7 (One_Fifty       Int_1_Par_Val,
-                             One_Fifty       Int_2_Par_Val,
-                             One_Fifty      *Int_Par_Ref);
-STATIC void NOINLINE Proc_8 (Arr_1_Dim       Arr_1_Par_Ref,
-                             Arr_2_Dim       Arr_2_Par_Ref,
-                             INT             Int_1_Par_Val,
-                             INT             Int_2_Par_Val);
-STATIC Enumeration NOINLINE Func_1 (Capital_Letter   Ch_1_Par_Val,
-                                    Capital_Letter   Ch_2_Par_Val);
-STATIC void NOINLINE Proc_3 (Rec_Pointer *Ptr_Ref_Par);
-STATIC void NOINLINE Proc_6 (Enumeration  Enum_Val_Par,
-                             Enumeration *Enum_Ref_Par);
 
-#ifndef PASS2
-#ifndef REG
-        Boolean Reg = false;
-#define REG
-        /* REG becomes defined as empty */
-        /* i.e. no register variables   */
-#else
-        Boolean Reg = true;
-#undef REG
-#define REG register
-#endif
-#endif
+        // forward declarations
+STORAGE_CLASS_DECLARATOR void POST_RET_DECLARATOR Proc_5 (void) ATTRIBUTES_DECLARATOR; /* without parameters */
+STORAGE_CLASS_DECLARATOR void POST_RET_DECLARATOR Proc_4 (void) ATTRIBUTES_DECLARATOR; /* without parameters */
+STORAGE_CLASS_DECLARATOR Boolean POST_RET_DECLARATOR Func_2 (const Str_30  Str_1_Par_Ref,
+                                                             const Str_30  Str_2_Par_Ref) ATTRIBUTES_DECLARATOR;
+STORAGE_CLASS_DECLARATOR void POST_RET_DECLARATOR Proc_7 (One_Fifty       Int_1_Par_Val,
+                                                          One_Fifty       Int_2_Par_Val,
+                                                          One_Fifty      *Int_Par_Ref) ATTRIBUTES_DECLARATOR;
+STORAGE_CLASS_DECLARATOR void POST_RET_DECLARATOR Proc_8 (Arr_1_Dim       Arr_1_Par_Ref,
+                                                          Arr_2_Dim       Arr_2_Par_Ref,
+                                                          INT             Int_1_Par_Val,
+                                                          INT             Int_2_Par_Val) ATTRIBUTES_DECLARATOR;
+STORAGE_CLASS_DECLARATOR Enumeration POST_RET_DECLARATOR Func_1 (Capital_Letter   Ch_1_Par_Val,
+                                                                 Capital_Letter   Ch_2_Par_Val) ATTRIBUTES_DECLARATOR;
+STORAGE_CLASS_DECLARATOR void POST_RET_DECLARATOR Proc_3 (Rec_Pointer *Ptr_Ref_Par) ATTRIBUTES_DECLARATOR;
+STORAGE_CLASS_DECLARATOR void POST_RET_DECLARATOR Proc_6 (Enumeration  Enum_Val_Par,
+                                                          Enumeration *Enum_Ref_Par) ATTRIBUTES_DECLARATOR;
 
 #ifdef PASS2
-  STATIC Boolean NOINLINE Func_3 (Enumeration Enum_Par_Val);
-#endif
+  STORAGE_CLASS_DECLARATOR Enumeration POST_RET_DECLARATOR Func_1 (Capital_Letter   Ch_1_Par_Val,
+                                                                   Capital_Letter   Ch_2_Par_Val) ATTRIBUTES_DECLARATOR;
+  STORAGE_CLASS_DECLARATOR Boolean POST_RET_DECLARATOR Func_2 (const Str_30  Str_1_Par_Ref,
+                                                               const Str_30  Str_2_Par_Ref) ATTRIBUTES_DECLARATOR;
+
+  STORAGE_CLASS_DECLARATOR Boolean POST_RET_DECLARATOR Func_3 (Enumeration Enum_Par_Val) ATTRIBUTES_DECLARATOR;
+#endif // PASS2
 #ifndef PASS2
+  // Pass 1 forward declarations
+  STORAGE_CLASS_DECLARATOR void POST_RET_DECLARATOR Proc_2 (One_Fifty      *Int_Par_Ref) ATTRIBUTES_DECLARATOR;
+  STORAGE_CLASS_DECLARATOR void POST_RET_DECLARATOR Proc_1 (REG Rec_Pointer Ptr_Val_Par) ATTRIBUTES_DECLARATOR;
+  void verify_result(REG INT             Number_Of_Runs,
+                         One_Fifty       Int_1_Loc,
+                     REG One_Fifty       Int_2_Loc,
+                         One_Fifty       Int_3_Loc,
+                         Enumeration     Enum_Loc,
+                         Str_30          Str_1_Loc,
+                         Str_30          Str_2_Loc);
 
 /* Global Variables: */
 
@@ -577,21 +587,9 @@ CHAR            Ch_1_Glob,
 INT             Arr_1_Glob [50];
 INT             Arr_2_Glob [50] [50];
 
-
-
-// forward declarations
-STATIC void NOINLINE Proc_2 (One_Fifty   *Int_Par_Ref);
-STATIC void NOINLINE Proc_1 (REG Rec_Pointer Ptr_Val_Par);
-void verify_result(REG INT             Number_Of_Runs,
-                       One_Fifty       Int_1_Loc,
-                   REG One_Fifty       Int_2_Loc,
-                       One_Fifty       Int_3_Loc,
-                       Enumeration     Enum_Loc,
-                       Str_30          Str_1_Loc,
-                       Str_30          Str_2_Loc);
-
-
 Boolean         Done;
+
+/* start of variables for time measurement */
 
 long            Begin_Time,
                 End_Time,
@@ -617,7 +615,7 @@ int main (int argc, const char *argv[])
   REG   INT             Run_Index;
   REG   INT             Number_Of_Runs;
 
-  _Static_assert (NUMBER_OF_RUNS < MAX_INT, "The selected int type is too small for the default number of runs!");
+  _Static_assert (NUMBER_OF_RUNS < MAX_INT, "The selected int type " INTTYPENAME " is too small for the default number of runs!");
 
   /* Arguments */
   if (argc > 2)
@@ -812,7 +810,7 @@ void verify_result(REG INT            Number_Of_Runs,
   fprintf (stderr, "        should be:   Number_Of_Runs + 10\n");
   fprintf (stderr, "        should be:   %d\n", Number_Of_Runs + 10);
   fprintf (stderr, "Ptr_Glob->\n");
-  fprintf (stderr, "  Ptr_Comp:          %d\n", (int) Ptr_Glob->Ptr_Comp); // Gcc generates warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+  fprintf (stderr, "  Ptr_Comp:          %p\n", Ptr_Glob->Ptr_Comp);
   fprintf (stderr, "        should be:   (implementation-dependent)\n");
   fprintf (stderr, "  Discr:             %d\n", Ptr_Glob->Discr);
   fprintf (stderr, "        should be:   %d\n", 0);
@@ -823,7 +821,7 @@ void verify_result(REG INT            Number_Of_Runs,
   fprintf (stderr, "  Str_Comp:          %s\n", Ptr_Glob->variant.var_1.Str_Comp);
   fprintf (stderr, "        should be:   DHRYSTONE PROGRAM, SOME STRING\n");
   fprintf (stderr, "Next_Ptr_Glob->\n");
-  fprintf (stderr, "  Ptr_Comp:          %d\n", (int) Next_Ptr_Glob->Ptr_Comp); // Gcc generates warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+  fprintf (stderr, "  Ptr_Comp:          %p\n", Next_Ptr_Glob->Ptr_Comp);
   fprintf (stderr, "        should be:   (implementation-dependent), same as above\n");
   fprintf (stderr, "  Discr:             %d\n", Next_Ptr_Glob->Discr);
   fprintf (stderr, "        should be:   %d\n", 0);
@@ -884,7 +882,7 @@ void verify_result(REG INT            Number_Of_Runs,
 }
 
 
-STATIC void NOINLINE Proc_1 (REG Rec_Pointer Ptr_Val_Par)
+STORAGE_CLASS void POST_RET Proc_1 (REG Rec_Pointer Ptr_Val_Par) ATTRIBUTES
 /******************/
     /* executed once */
 {
@@ -917,7 +915,7 @@ STATIC void NOINLINE Proc_1 (REG Rec_Pointer Ptr_Val_Par)
 } /* Proc_1 */
 
 
-STATIC void NOINLINE Proc_2 (One_Fifty   *Int_Par_Ref)
+STORAGE_CLASS void POST_RET Proc_2 (One_Fifty   *Int_Par_Ref) ATTRIBUTES
 /******************/
     /* executed once */
     /* *Int_Par_Ref == 1, becomes 4 */
@@ -939,12 +937,12 @@ STATIC void NOINLINE Proc_2 (One_Fifty   *Int_Par_Ref)
 } /* Proc_2 */
 
 
-STATIC void NOINLINE Proc_3 (Rec_Pointer *Ptr_Ref_Par)
+STORAGE_CLASS void POST_RET Proc_3 (Rec_Pointer *Ptr_Ref_Par) ATTRIBUTES
 /******************/
     /* executed once */
     /* Ptr_Ref_Par becomes Ptr_Glob */
 {
-  if (Ptr_Glob != Null)
+  if (Ptr_Glob != NULL)
     /* then, executed */
     *Ptr_Ref_Par = Ptr_Glob->Ptr_Comp;
   Proc_7 (10, Int_Glob, &Ptr_Glob->variant.var_1.Int_Comp);
@@ -952,7 +950,7 @@ STATIC void NOINLINE Proc_3 (Rec_Pointer *Ptr_Ref_Par)
 } /* Proc_3 */
 
 
-STATIC void NOINLINE Proc_4 (void) /* without parameters */
+STORAGE_CLASS void POST_RET Proc_4 (void) ATTRIBUTES /* without parameters */
 /*******/
     /* executed once */
 {
@@ -965,7 +963,7 @@ STATIC void NOINLINE Proc_4 (void) /* without parameters */
 } /* Proc_4 */
 
 
-STATIC void NOINLINE Proc_5 (void) /* without parameters */
+STORAGE_CLASS void POST_RET Proc_5 (void) ATTRIBUTES /* without parameters */
 /*******/
     /* executed once */
 {
@@ -978,10 +976,7 @@ STATIC void NOINLINE Proc_5 (void) /* without parameters */
         /* Procedure for the assignment of structures,          */
         /* if the C compiler doesn't support this feature       */
 #ifdef  NOSTRUCTASSIGN
-memcpy (d, s, l)
-register uint8_t   *d;
-register uint8_t   *s;
-register int    l;
+inline void *memcpy (REG void * restrict d, REG const void * restrict s t, size_t l)
 {
         while (l--) *d++ = *s++;
 }
@@ -1003,8 +998,8 @@ extern  INT     Int_Glob;
 extern  CHAR    Ch_1_Glob;
 
 
-STATIC void NOINLINE Proc_6 (Enumeration  Enum_Val_Par,
-                            Enumeration *Enum_Ref_Par)
+STORAGE_CLASS void POST_RET Proc_6 (Enumeration  Enum_Val_Par,
+                                    Enumeration *Enum_Ref_Par) ATTRIBUTES
 /*********************************/
     /* executed once */
     /* Enum_Val_Par == Ident_3, Enum_Ref_Par becomes Ident_2 */
@@ -1036,9 +1031,9 @@ STATIC void NOINLINE Proc_6 (Enumeration  Enum_Val_Par,
 } /* Proc_6 */
 
 
-STATIC void Proc_7 (One_Fifty       Int_1_Par_Val,
-                    One_Fifty       Int_2_Par_Val,
-                    One_Fifty      *Int_Par_Ref)
+STORAGE_CLASS void Proc_7 (One_Fifty       Int_1_Par_Val,
+                           One_Fifty       Int_2_Par_Val,
+                           One_Fifty      *Int_Par_Ref) ATTRIBUTES
 /**********************************************/
     /* executed three times                                      */ 
     /* first call:      Int_1_Par_Val == 2, Int_2_Par_Val == 3,  */
@@ -1056,10 +1051,10 @@ STATIC void Proc_7 (One_Fifty       Int_1_Par_Val,
 } /* Proc_7 */
 
 
-STATIC void NOINLINE Proc_8 (Arr_1_Dim       Arr_1_Par_Ref,
-                             Arr_2_Dim       Arr_2_Par_Ref,
-                             INT             Int_1_Par_Val,
-                             INT             Int_2_Par_Val)
+STORAGE_CLASS void POST_RET Proc_8 (Arr_1_Dim       Arr_1_Par_Ref,
+                                    Arr_2_Dim       Arr_2_Par_Ref,
+                                    INT             Int_1_Par_Val,
+                                    INT             Int_2_Par_Val) ATTRIBUTES
 /*********************************************************************/
     /* executed once      */
     /* Int_Par_Val_1 == 3 */
@@ -1081,8 +1076,8 @@ STATIC void NOINLINE Proc_8 (Arr_1_Dim       Arr_1_Par_Ref,
 } /* Proc_8 */
 
 
-STATIC Enumeration NOINLINE Func_1 (Capital_Letter   Ch_1_Par_Val,
-                                    Capital_Letter   Ch_2_Par_Val)
+STORAGE_CLASS Enumeration POST_RET Func_1 (Capital_Letter   Ch_1_Par_Val,
+                                           Capital_Letter   Ch_2_Par_Val) ATTRIBUTES
 /*************************************************/
     /* executed three times                                         */
     /* first call:      Ch_1_Par_Val == 'H', Ch_2_Par_Val == 'R'    */
@@ -1109,8 +1104,8 @@ STATIC Enumeration NOINLINE Func_1 (Capital_Letter   Ch_1_Par_Val,
 
 
 
-STATIC Boolean NOINLINE Func_2 (Str_30  Str_1_Par_Ref,
-                                Str_30  Str_2_Par_Ref)
+STORAGE_CLASS Boolean POST_RET Func_2 (const Str_30  Str_1_Par_Ref,
+                                       const Str_30  Str_2_Par_Ref) ATTRIBUTES
 /*************************************************/
     /* executed once */
     /* Str_1_Par_Ref == "DHRYSTONE PROGRAM, 1'ST STRING" */
@@ -1151,7 +1146,7 @@ STATIC Boolean NOINLINE Func_2 (Str_30  Str_1_Par_Ref,
 } /* Func_2 */
 
 
-STATIC Boolean NOINLINE Func_3 (Enumeration Enum_Par_Val)
+STORAGE_CLASS Boolean POST_RET Func_3 (Enumeration Enum_Par_Val) ATTRIBUTES
 /***************************/
     /* executed once        */
     /* Enum_Par_Val == Ident_3 */

@@ -2,7 +2,7 @@
 
       SRC=dhry1.c
        CC=gcc
- GCCFLAGS="-Wno-pointer-to-int-cast -fno-inline -fno-inline-functions"
+ GCCFLAGS="-fno-inline -fno-inline-functions"
    CFLAGS="${CFLAGS} -std=c99"
    CFLAGS="${CFLAGS} ${GCCFLAGS}"
   #CFLAGS="${CFLAGS} -DNDEBUG"                                                      # Print algorithm results
@@ -143,4 +143,5 @@ echo "${CC} -DPASS2 ${OPT3FLAGS} ${CFLAGS} ${FAST64FLAGS} $SRC dry1.o ${LFLAGS} 
 
 
 rm -f dry1.o
- 
+echo 
+echo === SUCCESS ===
