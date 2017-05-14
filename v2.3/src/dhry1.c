@@ -87,6 +87,9 @@
  *              A VALUE.
  *      -DDOPTIMIZE=n
  *              Indicates that the program was compiled with -On
+ *      -DINTTYPE=n
+ *              Size of int; 16, 32 or 64, using intn_t.
+ *              If negative, the corresponding int_fastn_t is used.
  *
  ***************************************************************************
  *
@@ -177,6 +180,7 @@
  *	- Output says which sort of clock it is using, and the HZ value
  *	- You can use -DREG instead of the -DREG=register of previous versions
  *	- Some stylistic cleanups.
+ *
  * Version C99/2.3, Fredrik Lundström, May 2017
  *	Functionally, identical to version 2.2; the changes are to match
  *	the development of compilers and computers during the last 25 years.
@@ -186,6 +190,8 @@
  *	   when a larger loop had to be tried.
  *	 - Removed output of µs/dhrystone
  *	 - Added -DOPTIMIZE flag to indicate in output how it was compiled
+ *	 - Added -DINTTYPE flag to define if int16_t, int32_t, int64_t,
+ *	   int_fast16_t, int_fast32_t or int_fast64_t is to be used.
  *	 - Uninteresting output is only printed if NDEBUG is defined.
  *	   Otherwize, assert() is used to verify the algorithm's expected
  *	   results.
@@ -414,7 +420,7 @@ struct tms      time_info;
 
 
 #define Mic_secs_Per_Second     1000000.0
-#define NUMBER_OF_RUNS		50000 /* Default number of runs */
+#define NUMBER_OF_RUNS		3000 /* Default number of runs */
 
 #ifdef  NOSTRUCTASSIGN
 #define structassign(d, s)      memcpy(&(d), &(s), sizeof(d))
@@ -422,13 +428,55 @@ struct tms      time_info;
 #define structassign(d, s)      d = s
 #endif
 
+#include <stdio.h>
+#include <string.h>  // for strcpy, strcmp
+#include <stdlib.h>  // For malloc, exit, atoi
+#include <stdbool.h> // For bool
+#include <assert.h>  // For final verification
+#include <stdint.h>
+
+#ifndef INTTYPE
+  // Use compiler and platform defaults - normally 32 bit integers
+  typedef int INT;
+  #define MAX_INT INT_MAX
+  #define INTTYPENAME "int"
+#elif (INTTYPE==16)
+  typedef int16_t INT;
+  #define MAX_INT INT16_MAX
+  #define INTTYPENAME "int16_t"
+#elif (INTTYPE==32)
+  typedef int32_t INT;
+  #define MAX_INT INT32_MAX
+  #define INTTYPENAME "int32_t"
+#elif (INTTYPE==64)
+  typedef int64_t INT;
+  #define MAX_INT INT64_MAX
+  #define INTTYPENAME "int64_t"
+#elif (INTTYPE==-16)
+  typedef int_fast16_t INT;
+  #define MAX_INT INT_FAST16_MAX
+  #define INTTYPENAME "int_fast16_t"
+#elif (INTTYPE==-32)
+  typedef int_fast32_t INT;
+  #define MAX_INT INT_FAST32_MAX
+  #define INTTYPENAME "int_fast32_t"
+#elif (INTTYPE==-64)
+  typedef int_fast64_t INT;
+  #define MAX_INT INT_FAST64_MAX
+#define INTTYPENAME "int_fast64_t"
+#else
+#error Invalid INTTYPE
+#endif
+
+typedef char CHAR;
+
 #ifdef  NOENUM
 #define Ident_1 0
 #define Ident_2 1
 #define Ident_3 2
 #define Ident_4 3
 #define Ident_5 4
-  typedef int   Enumeration;
+  typedef INT   Enumeration;
 #else
   typedef       enum    {Ident_1, Ident_2, Ident_3, Ident_4, Ident_5}
                 Enumeration;
@@ -446,23 +494,18 @@ struct tms      time_info;
 
 /* General definitions: */
 
-#include <stdio.h>
-#include <string.h>  // for strcpy, strcmp
-#include <stdlib.h>  // For malloc, exit, atoi
-#include <stdbool.h> // For bool
-#include <assert.h>  // For final verification
 #define Null 0 
                 /* Value of a Null pointer */
 #define true  1
 #define false 0
 
-typedef int     One_Thirty;
-typedef int     One_Fifty;
-typedef char    Capital_Letter;
+typedef INT     One_Thirty;
+typedef INT     One_Fifty;
+typedef CHAR    Capital_Letter;
 typedef bool    Boolean;
 typedef char    Str_30 [31];
-typedef int     Arr_1_Dim [50];
-typedef int     Arr_2_Dim [50] [50];
+typedef INT     Arr_1_Dim [50];
+typedef INT     Arr_2_Dim [50] [50];
 
 
 
@@ -473,7 +516,7 @@ typedef struct record
     union {
           struct {
                   Enumeration Enum_Comp;
-                  int         Int_Comp;
+                  INT         Int_Comp;
                   char        Str_Comp [31];
                   } var_1;
           struct {
@@ -481,8 +524,8 @@ typedef struct record
                   char        Str_2_Comp [31];
                   } var_2;
           struct {
-                  char        Ch_1_Comp;
-                  char        Ch_2_Comp;
+                  CHAR        Ch_1_Comp;
+                  CHAR        Ch_2_Comp;
                   } var_3;
           } variant;
       } Rec_Type, *Rec_Pointer;
@@ -497,8 +540,8 @@ STATIC void NOINLINE Proc_7 (One_Fifty       Int_1_Par_Val,
                              One_Fifty      *Int_Par_Ref);
 STATIC void NOINLINE Proc_8 (Arr_1_Dim       Arr_1_Par_Ref,
                              Arr_2_Dim       Arr_2_Par_Ref,
-                             int             Int_1_Par_Val,
-                             int             Int_2_Par_Val);
+                             INT             Int_1_Par_Val,
+                             INT             Int_2_Par_Val);
 STATIC Enumeration NOINLINE Func_1 (Capital_Letter   Ch_1_Par_Val,
                                     Capital_Letter   Ch_2_Par_Val);
 STATIC void NOINLINE Proc_3 (Rec_Pointer *Ptr_Ref_Par);
@@ -527,19 +570,19 @@ STATIC void NOINLINE Proc_6 (Enumeration  Enum_Val_Par,
 
 Rec_Pointer     Ptr_Glob,
                 Next_Ptr_Glob;
-int             Int_Glob;
+INT             Int_Glob;
 Boolean         Bool_Glob;
-char            Ch_1_Glob,
+CHAR            Ch_1_Glob,
                 Ch_2_Glob;
-int             Arr_1_Glob [50];
-int             Arr_2_Glob [50] [50];
+INT             Arr_1_Glob [50];
+INT             Arr_2_Glob [50] [50];
 
 
 
 // forward declarations
 STATIC void NOINLINE Proc_2 (One_Fifty   *Int_Par_Ref);
 STATIC void NOINLINE Proc_1 (REG Rec_Pointer Ptr_Val_Par);
-void verify_result(REG int             Number_Of_Runs,
+void verify_result(REG INT             Number_Of_Runs,
                        One_Fifty       Int_1_Loc,
                    REG One_Fifty       Int_2_Loc,
                        One_Fifty       Int_3_Loc,
@@ -567,12 +610,14 @@ int main (int argc, const char *argv[])
         One_Fifty       Int_1_Loc;
   REG   One_Fifty       Int_2_Loc;
         One_Fifty       Int_3_Loc;
-  REG   char            Ch_Index;
+  REG   CHAR            Ch_Index;
         Enumeration     Enum_Loc;
         Str_30          Str_1_Loc;
         Str_30          Str_2_Loc;
-  REG   int             Run_Index;
-  REG   int             Number_Of_Runs;
+  REG   INT             Run_Index;
+  REG   INT             Number_Of_Runs;
+
+  _Static_assert (NUMBER_OF_RUNS < MAX_INT, "The selected int type is too small for the default number of runs!");
 
   /* Arguments */
   if (argc > 2)
@@ -582,7 +627,12 @@ int main (int argc, const char *argv[])
   }
   if (argc == 2)
   {
-     Number_Of_Runs = atoi (argv[1]);
+     int Number_Of_Runs_Param = atoi (argv[1]);
+     if (Number_Of_Runs_Param >= MAX_INT) {
+        fprintf(stderr, "ERROR: The selected int type %s with MAX_INT=%d is too small for the number of runs %d!\n", INTTYPENAME, MAX_INT, Number_Of_Runs_Param);
+        exit (0);
+     }
+     Number_Of_Runs = Number_Of_Runs_Param;
   } else
   {
      Number_Of_Runs = NUMBER_OF_RUNS;
@@ -614,9 +664,9 @@ int main (int argc, const char *argv[])
   printf ("\n");
   printf ("Dhrystone Benchmark, Version %s\n", Version);
 #ifdef OPTIMIZE
-  const char optlevel = OPTIMIZE;
+  const CHAR optlevel = OPTIMIZE;
 #else
-  const char optlevel = 0;
+  const CHAR optlevel = 0;
 #endif
   const char *optstring = NULL;
   switch (optlevel) {
@@ -638,19 +688,17 @@ int main (int argc, const char *argv[])
   }
   if (Reg)
   {
-    printf ("Program compiled with 'register' attribute, optimization=%s\n", optstring);
+    printf ("Program compiled with 'register' attribute, optimization=%s, int=%s\n", optstring, INTTYPENAME);
   }
   else
   {
-    printf ("Program compiled without 'register' attribute, optimization=%s\n", optstring);
+    printf ("Program compiled without 'register' attribute, optimization=%s, int=%s\n", optstring, INTTYPENAME);
   }
   printf ("Using %s, HZ=%d\n", CLOCK_TYPE, HZ);
   printf ("\n");
 
   Done = false;
   while (!Done) {
-
-    // printf ("Trying %d runs through Dhrystone:\n", Number_Of_Runs);
 
     /***************/
     /* Start timer */
@@ -714,7 +762,13 @@ int main (int argc, const char *argv[])
 
     if (User_Time < Too_Small_Time)
     {
-      //printf ("Measured time too small to obtain meaningful results\n");
+      // Measured time too small to obtain meaningful results
+
+      if(Number_Of_Runs >= MAX_INT / 10) {
+        fprintf(stderr, "ERROR: Unable to calculate dhrystone, since the target is too fast for the selected int size!\n");
+        exit (0);
+      }
+
       Number_Of_Runs = Number_Of_Runs * 10;
       // Reset of globals Was missing in v2.2
       Int_Glob = 0;
@@ -733,7 +787,7 @@ int main (int argc, const char *argv[])
                 Str_1_Loc, Str_2_Loc);
 }
 
-void verify_result(REG int            Number_Of_Runs,
+void verify_result(REG INT            Number_Of_Runs,
                        One_Fifty      Int_1_Loc,
                    REG One_Fifty      Int_2_Loc,
                        One_Fifty      Int_3_Loc,
@@ -925,8 +979,8 @@ STATIC void NOINLINE Proc_5 (void) /* without parameters */
         /* if the C compiler doesn't support this feature       */
 #ifdef  NOSTRUCTASSIGN
 memcpy (d, s, l)
-register char   *d;
-register char   *s;
+register uint8_t   *d;
+register uint8_t   *s;
 register int    l;
 {
         while (l--) *d++ = *s++;
@@ -945,8 +999,8 @@ register int    l;
 #define REG register
 #endif
 
-extern  int     Int_Glob;
-extern  char    Ch_1_Glob;
+extern  INT     Int_Glob;
+extern  CHAR    Ch_1_Glob;
 
 
 STATIC void NOINLINE Proc_6 (Enumeration  Enum_Val_Par,
@@ -1004,8 +1058,8 @@ STATIC void Proc_7 (One_Fifty       Int_1_Par_Val,
 
 STATIC void NOINLINE Proc_8 (Arr_1_Dim       Arr_1_Par_Ref,
                              Arr_2_Dim       Arr_2_Par_Ref,
-                             int             Int_1_Par_Val,
-                             int             Int_2_Par_Val)
+                             INT             Int_1_Par_Val,
+                             INT             Int_2_Par_Val)
 /*********************************************************************/
     /* executed once      */
     /* Int_Par_Val_1 == 3 */

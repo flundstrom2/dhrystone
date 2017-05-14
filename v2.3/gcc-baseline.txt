@@ -5,60 +5,170 @@ Motherboard: MSI B250M Bazooka
 Chipset:     B250  
 RAM:         8GB 2xCrucial 4GB PC4-19200 DDR4 CL17 SR x8
 OS:          Windows 10 Home
-Compiler:    Cygwin GCC 5.4.0 
+Compiler:    Cygwin GCC 5.4.0
+Date:        2017-05-14
 -----------------------------------------
 
-gcc      -c  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions dhry1.c -o dry1.o
-gcc -DPASS2  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions dhry1.c dry1.o  -o dry2
+gcc      -c  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions                                                                                                                                                                                                dhry1.c -o dry1.o
+gcc -DPASS2  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions                                                                                                                                                                                                dhry1.c dry1.o  -o dry2
 
 Dhrystone Benchmark, Version C, Version 2.3
-Program compiled without 'register' attribute, optimization=none
+Program compiled without 'register' attribute, optimization=none, int=int
 Using times(), HZ=1000
 
-Dhrystones per Second:                        17067758
+Dhrystones per Second:                        17298044
 Required number of rounds:                      100000k
 gcc      -c -DREG  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions dhry1.c -o dry1.o
 gcc -DPASS2 -DREG  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions dhry1.c dry1.o  -o dry2nr
 
 Dhrystone Benchmark, Version C, Version 2.3
-Program compiled with 'register' attribute, optimization=none
+Program compiled with 'register' attribute, optimization=none, int=int
 Using times(), HZ=1000
 
-Dhrystones per Second:                        20644096
+Dhrystones per Second:                        20251114
 Required number of rounds:                      100000k
 gcc      -c -O1 -DOPTIMIZE=1  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions dhry1.c -o dry1.o
 gcc -DPASS2 -O1 -DOPTIMIZE=1  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions dhry1.c dry1.o  -o dry2o1
 
 Dhrystone Benchmark, Version C, Version 2.3
-Program compiled without 'register' attribute, optimization=1
+Program compiled without 'register' attribute, optimization=1, int=int
 Using times(), HZ=1000
 
-Dhrystones per Second:                        35752592
+Dhrystones per Second:                        36153288
 Required number of rounds:                      100000k
 gcc      -c -O2 -DOPTIMIZE=2  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions dhry1.c -o dry1.o
 gcc -DPASS2 -O2 -DOPTIMIZE=2  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions dhry1.c dry1.o  -o dry2o2
 
 Dhrystone Benchmark, Version C, Version 2.3
-Program compiled without 'register' attribute, optimization=2
+Program compiled without 'register' attribute, optimization=2, int=int
 Using times(), HZ=1000
 
-Dhrystones per Second:                        36363636
+Dhrystones per Second:                        36576444
 Required number of rounds:                      100000k
 gcc      -c -O3 -DOPTIMIZE=3  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions dhry1.c -o dry1.o
 gcc -DPASS2 -O3 -DOPTIMIZE=3  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions dhry1.c dry1.o  -o dry2o3
 
 Dhrystone Benchmark, Version C, Version 2.3
-Program compiled without 'register' attribute, optimization=3
+Program compiled without 'register' attribute, optimization=3, int=int
 Using times(), HZ=1000
 
-Dhrystones per Second:                        36363636
+Dhrystones per Second:                        36576444
 Required number of rounds:                      100000k
 gcc      -c -Os -DOPTIMIZE='s'  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions dhry1.c -o dry1.o
 gcc -DPASS2 -Os -DOPTIMIZE='s'  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions dhry1.c dry1.o  -o dry2os
 
 Dhrystone Benchmark, Version C, Version 2.3
-Program compiled without 'register' attribute, optimization=size
+Program compiled without 'register' attribute, optimization=size, int=int
 Using times(), HZ=1000
 
-Dhrystones per Second:                        19512194
+
+
+
+Dhrystones per Second:                        20708220
+Required number of rounds:                      100000k
+gcc      -c  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=16 dhry1.c -o dry1.o
+gcc -DPASS2  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=16 dhry1.c dry1.o  -o dry2int16
+
+Dhrystone Benchmark, Version C, Version 2.3
+Program compiled without 'register' attribute, optimization=none, int=int16_t
+Using times(), HZ=1000
+
+ERROR: Unable to calculate dhrystone, since the target is too fast for the selected int size!
+gcc      -c  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=32 dhry1.c -o dry1.o
+gcc -DPASS2  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=32 dhry1.c dry1.o  -o dry2int32
+
+Dhrystone Benchmark, Version C, Version 2.3
+Program compiled without 'register' attribute, optimization=none, int=int32_t
+Using times(), HZ=1000
+
+Dhrystones per Second:                        17298044
+Required number of rounds:                      100000k
+gcc      -c  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=64 dhry1.c -o dry1.o
+gcc -DPASS2  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=64 dhry1.c dry1.o  -o dry2fast64
+
+Dhrystone Benchmark, Version C, Version 2.3
+Program compiled without 'register' attribute, optimization=none, int=int64_t
+Using times(), HZ=1000
+
+Dhrystones per Second:                        16886186
+Required number of rounds:                      100000k
+gcc      -c  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=-16 dhry1.c -o dry1.o
+gcc -DPASS2  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=-16 dhry1.c dry1.o  -o dry2fast16
+
+Dhrystone Benchmark, Version C, Version 2.3
+Program compiled without 'register' attribute, optimization=none, int=int_fast16_t
+Using times(), HZ=1000
+
+Dhrystones per Second:                        16911532
+Required number of rounds:                      320000k
+gcc      -c  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=-32 dhry1.c -o dry1.o
+gcc -DPASS2  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=-32 dhry1.c dry1.o  -o dry2fast32
+
+Dhrystone Benchmark, Version C, Version 2.3
+Program compiled without 'register' attribute, optimization=none, int=int_fast32_t
+Using times(), HZ=1000
+
+Dhrystones per Second:                        16886186
+Required number of rounds:                      100000k
+gcc      -c  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=-64 dhry1.c -o dry1.o
+gcc -DPASS2  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=-64 dhry1.c dry1.o  -o dry2fast64
+
+Dhrystone Benchmark, Version C, Version 2.3
+Program compiled without 'register' attribute, optimization=none, int=int_fast64_t
+Using times(), HZ=1000
+
+Dhrystones per Second:                        16886186
+Required number of rounds:                      100000k
+gcc      -c -O3 -DOPTIMIZE=3  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=16 dhry1.c -o dry1.o
+gcc -DPASS2 -O3 -DOPTIMIZE=3  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=16 dhry1.c dry1.o  -o dry2o3int16
+
+Dhrystone Benchmark, Version C, Version 2.3
+Program compiled without 'register' attribute, optimization=3, int=int16_t
+Using times(), HZ=1000
+
+ERROR: Unable to calculate dhrystone, since the target is too fast for the selected int size!
+gcc      -c -O3 -DOPTIMIZE=3  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=32 dhry1.c -o dry1.o
+gcc -DPASS2 -O3 -DOPTIMIZE=3  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=32 dhry1.c dry1.o  -o dry2o3int32
+
+Dhrystone Benchmark, Version C, Version 2.3
+Program compiled without 'register' attribute, optimization=3, int=int32_t
+Using times(), HZ=1000
+
+Dhrystones per Second:                        36576444
+Required number of rounds:                      100000k
+gcc      -c -O3 -DOPTIMIZE=3  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=64 dhry1.c -o dry1.o
+gcc -DPASS2 -O3 -DOPTIMIZE=3  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=64 dhry1.c dry1.o  -o dry2o3fast64
+
+Dhrystone Benchmark, Version C, Version 2.3
+Program compiled without 'register' attribute, optimization=3, int=int64_t
+Using times(), HZ=1000
+
+Dhrystones per Second:                        34048348
+Required number of rounds:                      100000k
+gcc      -c -O3 -DOPTIMIZE=3  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=-16 dhry1.c -o dry1.o
+gcc -DPASS2 -O3 -DOPTIMIZE=3  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=-16 dhry1.c dry1.o  -o dry2o3fast16
+
+Dhrystone Benchmark, Version C, Version 2.3
+Program compiled without 'register' attribute, optimization=3, int=int_fast16_t
+Using times(), HZ=1000
+
+Dhrystones per Second:                        33848108
+Required number of rounds:                      320000k
+gcc      -c -O3 -DOPTIMIZE=3  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=-32 dhry1.c -o dry1.o
+gcc -DPASS2 -O3 -DOPTIMIZE=3  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=-32 dhry1.c dry1.o  -o dry2o3fast32
+
+Dhrystone Benchmark, Version C, Version 2.3
+Program compiled without 'register' attribute, optimization=3, int=int_fast32_t
+Using times(), HZ=1000
+
+Dhrystones per Second:                        33863868
+Required number of rounds:                      100000k
+gcc      -c -O3 -DOPTIMIZE=3  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=-64 dhry1.c -o dry1.o
+gcc -DPASS2 -O3 -DOPTIMIZE=3  -std=c99 -Wno-pointer-to-int-cast -fno-inline -fno-inline-functions -DINTTYPE=-64 dhry1.c dry1.o  -o dry2o3fast64
+
+Dhrystone Benchmark, Version C, Version 2.3
+Program compiled without 'register' attribute, optimization=3, int=int_fast64_t
+Using times(), HZ=1000
+
+Dhrystones per Second:                        33863868
 Required number of rounds:                      100000k
