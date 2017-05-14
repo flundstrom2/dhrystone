@@ -59,12 +59,6 @@
  *              Note that an optimal "register" strategy is
  *              compiler-dependent, and that "register" declarations
  *              do not necessarily lead to faster execution.
- *      -DNOSTRUCTASSIGN        (default: Not defined)
- *              Define if the C compiler does not support
- *              assignment of structures.
- *      -DNOENUMS               (default: Not defined)
- *              Define if the C compiler does not support
- *              enumeration types.
  *      -DTIMES                 (default)
  *      -DTIME
  *              The "times" function of UNIX (returning process times)
@@ -184,8 +178,9 @@
  * Version C99/2.3, Fredrik Lundström, May 2017
  *	Functionally, identical to version 2.2; the changes are to match
  *	the development of compilers and computers during the last 25 years.
- *	 - Modified to use C99: Uses stdint and stdbool types.
- *	 - Added #pragmas and __attribute__ to prevent function inlining
+ *	 - Modified to use C99: Uses stdint and stdbool types,
+ *	   removed -DNOSTRUCTASSIGN and -DNOENUMS.
+ *	 - Added #pragmas, __dedecl and __attribute__ to prevent function inlining
  *	 - Corrected bug in 2.2: Global variables weren't reset
  *	   when a larger loop had to be tried.
  *	 - Removed output of µs/dhrystone
@@ -425,11 +420,7 @@ struct tms      time_info;
 #define Mic_secs_Per_Second     1000000.0
 #define NUMBER_OF_RUNS		3000 /* Default number of runs */
 
-#ifdef  NOSTRUCTASSIGN
-#define structassign(d, s)      memcpy(&(d), &(s), sizeof(d))
-#else
 #define structassign(d, s)      d = s
-#endif
 
 #include <stdio.h>
 #include <string.h>  // for strcpy, strcmp
@@ -763,7 +754,7 @@ int main (int argc, const char *argv[])
       // Measured time too small to obtain meaningful results
 
       if(Number_Of_Runs >= MAX_INT / 10) {
-        fprintf(stderr, "ERROR: Unable to calculate dhrystone, since the target is too fast for the selected int size!\n");
+        fprintf(stderr, "ERROR: Unable to calculate dhrystone, since the target is too fast for the selected int size %s!\n", INTTYPENAME);
         exit (0);
       }
 
